@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Qualitance
+# Licensed under the Apache License, Version 2.0.
+
+# Fail script if any command fails.
+set -e
+
+# How to use this tool:
+printUsage() {
+  cat <<EOF
+Usage: $(basename "${0}") [options]
+Options:
+  [-d | --debug]                            enables debug mode
+  [-h | --help]                             shows this usage
+EOF
+}
+
+# Parse arguments.
+while [[ ${#} -ge 1 ]]; do
+  # Debug mode
+  if [[ "${1}" == "-d" || "${1}" == "--debug" ]]; then
+    shift
+    set -x
+    continue
+  fi
+  # Help: display usage
+  if [[ "${1}" == "-h" || "${1}" == "--help" ]]; then
+    shift
+    printUsage
+    exit 0
+  fi
+  # Unrecognized argument.
+  printf "\e[1m\e[31mERROR: Unrecognized argument %s.\e[0m\e[0m\n" "${1}" >&2
+  printUsage
+  exit 1
+done
+
+script_path="$(dirname "$(readlink -f "${0}")")"
+pushd "${script_path}" 1> /dev/null
+{
+GOPATH=$(git rev-parse --show-toplevel)
+}
+popd 1> /dev/null
+GOBIN=${GOPATH}/bin
+
+export GOPATH
+export GOBIN
+
+pushd "${GOPATH}" 1> /dev/null
+{
+  go run main.go --config ./config.json
+  result=${?}
+}
+popd 1> /dev/null
+
+# shellcheck disable=SC2181
+if [[ ${result} -eq 0 ]]; then
+  printf "\nDone.\n"
+else
+  printf "\nErrors were encountered.\n"
+  exit 3
+fi
+
