@@ -1,10 +1,13 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
+
+	"config"
 )
 
 func main() {
-    fmt.Println("Hello, world!")
+	for key, value := range config.Configuration.Data {
+		fmt.Println(key, value)
+	}
 }
-

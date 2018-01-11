@@ -1,0 +1,15 @@
+version: '3.0'
+
+services:
+  go-boilerplate-test:
+    build:
+      context: ../../..
+      dockerfile: ./scripts/docker/test/Dockerfile
+    container_name: go-boilerplate-Test
+    image: go-boilerplate:self-built
+
+networks:
+  default:
+    external:
+      name: Network-Boilerplate
+

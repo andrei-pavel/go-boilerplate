@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
+# Licensed under the MIT License
+
+# Get script path and append it to PATH so other scripts are callable.
+SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
+PATH="${PATH}:${SCRIPT_PATH}"
+
+# Header
+ARGUMENTS="\
+  [\$hosts]                    hosts to deploy to, else deploy locally
+"
+. header
+
+# Get toplevel path.
+pushd "${SCRIPT_PATH}" 1> /dev/null
+{
+  toplevel=$(git rev-parse --show-toplevel)
+}
+popd 1> /dev/null
+
+
+pushd "${toplevel}" 1> /dev/null
+{
+  if (( ${#} == 0 )); then
+    # Locally
+    # Make sure network exists.
+    network="$(docker network ls -q --filter 'name=Network-Boilerplate')"
+    if [[ -z "${network}" ]]; then
+      docker network create 'Network-Boilerplate'
+    fi
+    docker-compose up -d --build --force-recreate
+  else
+    # Remotely
+    root_directory="$(basename "${toplevel}")"
+    for host in "${@}"; do
+      scripts/rsync-synchronize "./" "${host}:${root_directory}/"
+      ssh "${host}" "\
+        cd \"${root_directory}\"
+        scripts/deploy
+      "
+    done
+  fi
+}
+popd 1> /dev/null

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
+# Licensed under the MIT License
+
+# Get script path and append it to PATH so other scripts are callable.
+SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
+PATH="${PATH}:${SCRIPT_PATH}"
+
+# Header
+ARGUMENTS="\
+  \$hosts                       hosts to deploy to
+"
+. header
+
+# Get toplevel path.
+pushd "${SCRIPT_PATH}" 1> /dev/null
+{
+  toplevel=$(git rev-parse --show-toplevel)
+}
+popd 1> /dev/null
+
+pushd "${toplevel}" 1> /dev/null
+{
+  if (( ${#} == 0 )); then
+    # Locally
+    docker-compose logs -f
+  else
+    # Remotely
+    root_directory="$(basename "${toplevel}")"
+    for host in "${@}"; do
+      ssh "${host}" "\
+        cd \"${root_directory}\"
+        scripts/monitor
+      "
+    done
+  fi
+}
+popd 1> /dev/null

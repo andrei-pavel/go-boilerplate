@@ -1,6 +1,8 @@
-Simple Go boilerplate
+# Simple Go boilerplate
 
-Usage:
+Contains self-sufficient build system, document-generator, formatter & linter.
+
+## Usage
 ```
 scripts/build [--fast]
 scripts/doc

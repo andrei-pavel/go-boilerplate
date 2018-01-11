@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
+# Licensed under the MIT License
+
+# Get script path and append it to PATH so other scripts are callable.
+SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
+PATH="${PATH}:${SCRIPT_PATH}"
+
+# Header
+ARGUMENTS="\
+  [-i|--in-docker]             specified if it is called from inside Docker so
+                               that it can do actual testing
+  \$hosts                       hosts to deploy to
+"
+# . header
+. utils
+
+# Parse arguments.
+in_docker=false
+while (( ${#} > 0 )); do
+  case "${1}" in
+  '-i'|'--in-docker') in_docker=true ;;
+  *) hosts+=" ${1}"
+  esac; shift
+done
+
+# Get toplevel path.
+pushd "${SCRIPT_PATH}" 1> /dev/null
+{
+  GOPATH=$(git rev-parse --show-toplevel)
+}
+popd 1> /dev/null
+
+# Export Go variables.
+GOBIN=${GOPATH}/bin
+export GOPATH
+export GOBIN
+
+exit_code=0
+pushd "${GOPATH}" 1> /dev/null
+{
+  if ${in_docker}; then
+    directories=$(find src -type d)
+    for directory in ${directories}; do
+      if [[ ${directory} == *"github.com"* ]]; then
+        continue
+      fi
+      if [[ ${directory} == *"golang.org"* ]]; then
+        continue
+      fi
+      if [[ ${directory} == *"gopkg.in"* ]]; then
+        continue
+      fi
+      pushd ${directory} 1> /dev/null
+      {
+        go test -args --config "${GOPATH}/config.yaml" 2>&1 | grep -v "no Go files" | grep -v "no test files"
+      }
+      popd 1> /dev/null
+    done
+  else
+    if (( ${#hosts} == 0 )); then
+      # Locally
+
+      # Make sure network exists.
+      network="$(docker network ls -q --filter 'name=Network-Boilerplate')"
+      if [[ -z "${network}" ]]; then
+        docker network create 'Network-Boilerplate'
+      fi
+
+      # Build and run.
+      pushd './scripts/docker/test' 1> /dev/null
+      {
+        docker-compose up --build --abort-on-container-exit --force-recreate
+      }
+      popd 1> /dev/null
+    else
+      # Remotely
+      root_directory="$(basename "${GOPATH}")"
+      for host in ${hosts}; do
+        scripts/rsync-synchronize "./" "${host}:${root_directory}/"
+        ssh "${host}" "\
+          cd \"${root_directory}\"
+          scripts/test
+        "
+      done
+    fi
+  fi
+}
+popd 1> /dev/null
