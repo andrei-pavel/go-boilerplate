@@ -12,7 +12,7 @@ ARGUMENTS="\
   [-f|--fast]                  skips 'go get' commands
   \$architecture                architecture i.e. 'arm', 'windows'
 "
-. header
+. ${SCRIPT_PATH}/lib/header
 
 # Parse arguments.
 while (( ${#} > 0 )); do
@@ -39,15 +39,6 @@ export GOBIN
 pushd "${GOPATH}" 1> /dev/null
 {
   go clean -r
-  result=${?}
 }
 popd 1> /dev/null
-
-# Print result.
-if (( result == 0 )); then
-  printf "\nDone.\n"
-else
-  printf "\nErrors were encountered.\n"
-  exit 3
-fi
 

@@ -11,7 +11,7 @@ PATH="${PATH}:${SCRIPT_PATH}"
 ARGUMENTS="\
   [\$hosts]                    hosts to deploy to, else deploy locally
 "
-. header
+. ${SCRIPT_PATH}/lib/header
 
 # Get toplevel path.
 pushd "${SCRIPT_PATH}" 1> /dev/null

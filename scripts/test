@@ -13,8 +13,8 @@ ARGUMENTS="\
                                that it can do actual testing
   \$hosts                       hosts to deploy to
 "
-# . header
-. utils
+. ${SCRIPT_PATH}/lib/header
+. ${SCRIPT_PATH}/lib/utils
 
 # Parse arguments.
 in_docker=false
@@ -37,7 +37,6 @@ GOBIN=${GOPATH}/bin
 export GOPATH
 export GOBIN
 
-exit_code=0
 pushd "${GOPATH}" 1> /dev/null
 {
   if ${in_docker}; then
