@@ -1,7 +1,7 @@
 FROM golang:alpine AS builder
 
 # Install dependencies.
-RUN apk add --update-cache bash curl git
+RUN apk add --update-cache bash git
 
 # Copy git repository to guest.
 ADD . /opt/go-boilerplate
