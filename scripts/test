@@ -53,7 +53,7 @@ pushd "${GOPATH}" 1> /dev/null
       fi
       pushd ${directory} 1> /dev/null
       {
-        go test -args --config "${GOPATH}/config.yaml" 2>&1 | grep -v "no Go files" | grep -v "no test files"
+        go test -args --config "${GOPATH}/config.yaml" 2>&1 | grep -v "no Go files" | grep -v "no test files" || true
       }
       popd 1> /dev/null
     done
