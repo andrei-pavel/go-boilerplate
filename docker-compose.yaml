@@ -9,7 +9,7 @@ services:
     image: go-boilerplate:self-built
     restart: on-failure
     ports:
-      - 9091:9091
+      - 1025:1025
 
 networks:
   default:
