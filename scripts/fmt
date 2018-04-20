@@ -33,16 +33,19 @@ GOBIN=${GOPATH}/bin
 export GOPATH
 export GOBIN
 
+tmp="$(mktemp -u)"
+
 pushd "${GOPATH}" 1> /dev/null
 {
-  files=$(find . -maxdepth 1 -type f -name "*.go")
+  files=$(find . -type f -name "*.go")
   for file in ${files}; do
     if [[ ${file} == *"src/github.com"* || \
           ${file} == *"src/golang.org"* || \
           ${file} == *"src/gopkg.in"* ]]; then
       continue
     fi
-    go fmt "${file}"
+    gofmt -e -s "${file}" > "${tmp}"
+    mv "${tmp}" "${file}"
   done
 }
 popd 1> /dev/null
