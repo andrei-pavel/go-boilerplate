@@ -30,7 +30,7 @@ pushd "${toplevel}" 1> /dev/null
     if [[ -z "${network}" ]]; then
       docker network create 'Network-Boilerplate'
     fi
-    docker-compose up -d --build --force-recreate
+    docker-compose up -d --build --force-recreate --remove-orphans
   else
     # Remotely
     root_directory="$(basename "${toplevel}")"
