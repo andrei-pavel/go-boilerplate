@@ -1,15 +1,10 @@
 #!/bin/bash
 
-# Copyright (C) 2017-2018 Qualitance, andrei.pavel@qualitance.com
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
 # Licensed under the MIT License
 
 # Fail script if any command fails.
 set -e
-
-# Traps
-for t in ; do
-  trap "return_code=\${?}; trap - EXIT; printf \"${t} %s\\n\" \"\${return_code}\" 1>&2" ${t}
-done
 
 # Colors
 RESET="\e[1m\e[0m"
@@ -27,13 +22,13 @@ function printUsage() {
   if [[ -z ${ARGUMENTS} ]]; then
     local arguments=""
   else
-    local arguments="<arguments>"
+    local arguments="{{arguments}}"
     ARGUMENTS="
 Arguments:
 ${ARGUMENTS}"
   fi
   printf "\
-Usage: %s <options> %s
+Usage: %s {{options}} %s
 Options:
   [-d|--debug]                 Enables debug mode, showing every executed statement.
   [-h|--help]                  Prints usage (this text).%s
@@ -50,3 +45,12 @@ while (( i <= ${#} )); do
   '-h'|'--help') printUsage; exit 0 ;;
   esac; i=$(( i + 1 ))
 done
+
+function additional() {
+  local additional_arguments=
+  case $- in
+    *x* ) additional_arguments+=" -d";;
+    * )   ;;
+  esac
+  printf "%s" "${additional_arguments}"
+}

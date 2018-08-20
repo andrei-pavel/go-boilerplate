@@ -1,12 +1,31 @@
 #!/bin/bash
 
-# Copyright (C) 2017-2018 Qualitance, andrei.pavel@qualitance.com
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
 # Licensed under the MIT License
 
-mandatory() {
+# Get script path.
+script_path="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+# Header
+. "${script_path}/header"
+
+function confirm() {
+  # call with a prompt string or use a default
+  read -r -p "${1:-Are you sure? [y/N]} " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      true
+      ;;
+    *)
+      false
+      ;;
+  esac
+}
+
+function mandatory() {
   while (( ${#} > 0 )); do
     if [[ -z ${!1} ]]; then
-      printf "%s argument is mandatory.\n" "${argument}" >&2
+      printf "${RED}%s${RESET} argument is mandatory.\\n" "${1}" >&2
       printUsage
       exit 2
     fi

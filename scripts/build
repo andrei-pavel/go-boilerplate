@@ -12,7 +12,8 @@ ARGUMENTS="\
   [\$architecture]              architecture to build for i.e. 'arm',
                                'windows', otherwise build natively
 "
-. ${SCRIPT_PATH}/lib/header
+. "${SCRIPT_PATH}/lib/header"
+. "${SCRIPT_PATH}/lib/spinner"
 
 # Parse arguments.
 while (( ${#} > 0 )); do
@@ -27,16 +28,20 @@ done
 
 function build() {
   if [[ ${architecture} == "arm" ]]; then
-    printf '%s\n' "Building for Linux ARM..."
+    start_spinner 'Building for Linux ARM...'
     env GOOS=linux GOARCH=arm GOARM=6 go build -v
+    result=${?}
   elif [[ ${architecture} == "windows" ]]; then
-    printf '%s\n' "Building for Windows..."
+    start_spinner 'Building for Windows...'
     env GOOS=windows GOARCH=amd64 go build -v
+    result=${?}
   else
-    printf '%s\n' "Building..."
+    start_spinner 'Building...'
     go build -v
+    result=${?}
   fi
-  return ${?}
+  stop_spinner ${result}
+  return ${result}
 }
 
 function import_dependencies() {

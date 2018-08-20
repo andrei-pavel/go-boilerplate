@@ -10,7 +10,8 @@ PATH="${PATH}:${SCRIPT_PATH}"
 # Header
 ARGUMENTS="\
 "
-. ${SCRIPT_PATH}/lib/header
+. "${SCRIPT_PATH}/lib/header"
+. "${SCRIPT_PATH}/lib/spinner"
 
 # Parse arguments.
 while (( ${#} > 0 )); do
@@ -43,6 +44,7 @@ export GOBIN
 # Lint recursively.
 pushd "${GOPATH}" 1> /dev/null
 {
+  start_spinner 'Linting...'
   directories=$(find src -mindepth 1 -maxdepth 1 -type d)
   files=$(find . -maxdepth 1 -type f -name "*.go")
   recursive_directories=
@@ -55,6 +57,6 @@ pushd "${GOPATH}" 1> /dev/null
     recursive_directories+="${directory}/... "
   done
   gometalinter ${recursive_directories} ${files} | sort -V
+  stop_spinner ${?}
 }
 popd 1> /dev/null
-

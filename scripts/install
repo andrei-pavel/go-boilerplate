@@ -10,7 +10,8 @@ PATH="${PATH}:${SCRIPT_PATH}"
 # Header
 ARGUMENTS="\
 "
-. ${SCRIPT_PATH}/lib/header
+. "${SCRIPT_PATH}/lib/header"
+. "${SCRIPT_PATH}/lib/spinner"
 
 # Parse arguments.
 while (( ${#} > 0 )); do
@@ -20,8 +21,6 @@ while (( ${#} > 0 )); do
     printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; printUsage; exit 1 ;;
   esac; shift
 done
-
-mandatory fast platform
 
 # Get toplevel path.
 pushd "${SCRIPT_PATH}" 1> /dev/null
@@ -37,7 +36,8 @@ export GOBIN
 
 pushd "${GOPATH}" 1> /dev/null
 {
+  start_spinner 'Installing...'
   go install -v
+  stop_spinner ${?}
 }
 popd 1> /dev/null
-

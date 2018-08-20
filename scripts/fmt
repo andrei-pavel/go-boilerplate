@@ -10,7 +10,8 @@ PATH="${PATH}:${SCRIPT_PATH}"
 # Header
 ARGUMENTS="\
 "
-. ${SCRIPT_PATH}/lib/header
+. "${SCRIPT_PATH}/lib/header"
+. "${SCRIPT_PATH}/lib/spinner"
 
 # Parse arguments.
 while (( ${#} > 0 )); do
@@ -35,6 +36,7 @@ export GOBIN
 
 tmp="$(mktemp -u)"
 
+start_spinner 'Formatting...'
 pushd "${GOPATH}" 1> /dev/null
 {
   files=$(find . -type f -name "*.go")
@@ -49,4 +51,4 @@ pushd "${GOPATH}" 1> /dev/null
   done
 }
 popd 1> /dev/null
-
+stop_spinner 0

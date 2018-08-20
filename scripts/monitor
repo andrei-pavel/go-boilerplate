@@ -11,7 +11,7 @@ PATH="${PATH}:${SCRIPT_PATH}"
 ARGUMENTS="\
   \$hosts                       hosts to deploy to
 "
-. ${SCRIPT_PATH}/lib/header
+. "${SCRIPT_PATH}/lib/header"
 
 # Get toplevel path.
 pushd "${SCRIPT_PATH}" 1> /dev/null
@@ -37,4 +37,3 @@ pushd "${toplevel}" 1> /dev/null
   fi
 }
 popd 1> /dev/null
-
