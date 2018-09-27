@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2017-2018 Qualitance, andrei.pavel@qualitance.com
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
 # Licensed under the MIT License
 
 # Get script path and append it to PATH so other scripts are callable.

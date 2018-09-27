@@ -43,7 +43,7 @@ pushd "${toplevel}" 1> /dev/null
       start_spinner "Deploying remotely on ${host}..."
       ssh "${host}" "\
         cd \"${root_directory}\"
-        scripts/deploy
+        scripts/deploy $(additional)
       "
       stop_spinner ${?}
     done

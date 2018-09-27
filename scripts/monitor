@@ -31,7 +31,7 @@ pushd "${toplevel}" 1> /dev/null
     for host in "${@}"; do
       ssh "${host}" "\
         cd \"${root_directory}\"
-        scripts/monitor
+        scripts/monitor $(additional)
       "
     done
   fi

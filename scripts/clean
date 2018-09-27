@@ -9,8 +9,6 @@ PATH="${PATH}:${SCRIPT_PATH}"
 
 # Header
 ARGUMENTS="\
-  [-f|--fast]                  skips 'go get' commands
-  \$architecture                architecture i.e. 'arm', 'windows'
 "
 . "${SCRIPT_PATH}/lib/header"
 . "${SCRIPT_PATH}/lib/spinner"
@@ -39,9 +37,9 @@ export GOBIN
 # Clean.
 pushd "${GOPATH}" 1> /dev/null
 {
-  spinner_start 'Cleaning...'
+  start_spinner 'Cleaning...'
   go clean -r
-  spinner_stop ${?}
+  stop_spinnner ${?}
 }
 popd 1> /dev/null
 

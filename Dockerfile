@@ -1,5 +1,5 @@
 #################################### BUILDER ###################################
-FROM golang:alpine AS builder
+FROM golang:latest AS builder
 
 # Install dependencies.
 RUN apk add --update-cache bash git

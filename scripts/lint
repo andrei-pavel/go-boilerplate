@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2017-2018 Qualitance, andrei.pavel@qualitance.com
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
 # Licensed under the MIT License
 
 # Get script path and append it to PATH so other scripts are callable.
@@ -45,7 +45,7 @@ export GOBIN
 pushd "${GOPATH}" 1> /dev/null
 {
   start_spinner 'Linting...'
-  directories=$(find src -mindepth 1 -maxdepth 1 -type d)
+  directories=$(find src -mindepth 1 -maxdepth 1 -type d | sort -V)
   files=$(find . -maxdepth 1 -type f -name "*.go")
   recursive_directories=
   for directory in ${directories}; do

@@ -9,18 +9,18 @@ PATH="${PATH}:${SCRIPT_PATH}"
 
 # Header
 ARGUMENTS="\
-  [-i|--in-docker]             specified if it is called from inside Docker so
-                               that it can do actual testing
+  [-wd|--with-docker]          run tests on Docker
   \$hosts                       hosts to deploy to
 "
 . "${SCRIPT_PATH}/lib/header"
 . "${SCRIPT_PATH}/lib/utils"
 
 # Parse arguments.
-in_docker=false
+with_docker=false
 while (( ${#} > 0 )); do
   case "${1}" in
-  '-i'|'--in-docker') in_docker=true ;;
+  # [-wd|--with-docker]          run tests on Docker
+  '-wd'|'--with-docker') with_docker=true ;;
   *) hosts+=" ${1}"
   esac; shift
 done
@@ -39,32 +39,14 @@ export GOBIN
 
 pushd "${GOPATH}" 1> /dev/null
 {
-  if ${in_docker}; then
-    directories=$(find src -type d)
-    for directory in ${directories}; do
-      if [[ ${directory} == *"github.com"* ]]; then
-        continue
-      fi
-      if [[ ${directory} == *"golang.org"* ]]; then
-        continue
-      fi
-      if [[ ${directory} == *"gopkg.in"* ]]; then
-        continue
-      fi
-      pushd ${directory} 1> /dev/null
-      {
-        go test -args --config "${GOPATH}/config.yaml" 2>&1 | grep -v "no Go files" | grep -v "no test files" || true
-      }
-      popd 1> /dev/null
-    done
-  else
+  if ${with_docker}; then
     if (( ${#hosts} == 0 )); then
       # Locally
 
       # Make sure network exists.
-      network="$(docker network ls -q --filter 'name=Network-Boilerplate')"
+      network="$(docker network ls -q --filter 'name=Network-QChat')"
       if [[ -z "${network}" ]]; then
-        docker network create 'Network-Boilerplate'
+        docker network create 'Network-QChat'
       fi
 
       # Build and run.
@@ -80,10 +62,28 @@ pushd "${GOPATH}" 1> /dev/null
         scripts/rsync-synchronize "./" "${host}:${root_directory}/"
         ssh "${host}" "\
           cd \"${root_directory}\"
-          scripts/test
+          scripts/test $(additional)
         "
       done
     fi
+  else
+    directories=$(find src -type d | sort -V)  # sort for same order on subsequent runs
+    for directory in ${directories}; do
+      if [[ ${directory} == *"github.com"* ]]; then
+        continue
+      fi
+      if [[ ${directory} == *"golang.org"* ]]; then
+        continue
+      fi
+      if [[ ${directory} == *"gopkg.in"* ]]; then
+        continue
+      fi
+      pushd ${directory} 1> /dev/null
+      {
+        go test -args --config "${GOPATH}/config.yaml" || true
+      }
+      popd 1> /dev/null
+    done
   fi
 }
 popd 1> /dev/null
