@@ -44,9 +44,9 @@ pushd "${GOPATH}" 1> /dev/null
       # Locally
 
       # Make sure network exists.
-      network="$(docker network ls -q --filter 'name=Network-QChat')"
+      network="$(docker network ls -q --filter 'name=Network-Boilerplate')"
       if [[ -z "${network}" ]]; then
-        docker network create 'Network-QChat'
+        docker network create 'Network-Boilerplate'
       fi
 
       # Build and run.
