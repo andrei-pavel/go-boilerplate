@@ -22,24 +22,14 @@ while (( ${#} > 0 )); do
   esac; shift
 done
 
-# Get toplevel path.
-pushd "${SCRIPT_PATH}" 1> /dev/null
-{
-  GOPATH=$(git rev-parse --show-toplevel)
-}
-popd 1> /dev/null
-
 # Export Go variables.
-GOBIN=${GOPATH}/bin
-export GOPATH
-export GOBIN
+. "${SCRIPT_PATH}/go-env"
 
 # Clean.
 pushd "${GOPATH}" 1> /dev/null
 {
   start_spinner 'Cleaning...'
   go clean -r
-  stop_spinnner ${?}
+  stop_spinner ${?}
 }
 popd 1> /dev/null
-

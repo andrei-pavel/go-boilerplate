@@ -29,17 +29,8 @@ if ! command -v gometalinter 1> /dev/null; then
   gometalinter --install
 fi
 
-# Get toplevel path.
-pushd "${SCRIPT_PATH}" 1> /dev/null
-{
-  GOPATH=$(git rev-parse --show-toplevel)
-}
-popd 1> /dev/null
-
 # Export Go variables.
-GOBIN=${GOPATH}/bin
-export GOPATH
-export GOBIN
+. "${SCRIPT_PATH}/go-env"
 
 # Lint recursively.
 pushd "${GOPATH}" 1> /dev/null
