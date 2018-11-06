@@ -24,7 +24,7 @@ pushd "${toplevel}" 1> /dev/null
 {
   if (( ${#} == 0 )); then
     # Locally
-    docker-compose logs -f
+    docker-compose logs -f --tail=128
   else
     # Remotely
     root_directory="$(basename "${toplevel}")"
