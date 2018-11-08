@@ -42,7 +42,6 @@ function build() {
     result=${?}
   fi
   stop_spinner ${result}
-  return ${result}
 }
 
 function import_dependencies() {
@@ -76,7 +75,7 @@ pushd "${GOPATH}" 1> /dev/null
     import_dependencies
 
     # Build again.
-    build
+    build || true
   fi
 }
 popd 1> /dev/null
