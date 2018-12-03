@@ -21,26 +21,24 @@ while (( ${#} > 0 )); do
   *)
     # [\$architecture]              architecture to build for i.e. 'arm',
     #                              'windows', otherwise build natively
-    [[ -z ${architecture} ]] && architecture="${1}" && shift && continue
+    [[ -z ${architecture+x} ]] && architecture="${1}" && shift && continue
     # Unrecognized argument
     printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; printUsage; exit 1 ;;
   esac; shift
 done
 
 function build() {
-  if [[ ${architecture} == "arm" ]]; then
+  if [[ -z ${architecture+x} ]]; then
+    start_spinner 'Building...'
+    go build -v
+  elif [[ ${architecture} == "arm" ]]; then
     start_spinner 'Building for Linux ARM...'
     env GOOS=linux GOARCH=arm GOARM=6 go build -v
-    result=${?}
   elif [[ ${architecture} == "windows" ]]; then
     start_spinner 'Building for Windows...'
     env GOOS=windows GOARCH=amd64 go build -v
-    result=${?}
-  else
-    start_spinner 'Building...'
-    go build -v
-    result=${?}
   fi
+  result=${?}
   stop_spinner ${result}
 }
 
