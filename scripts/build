@@ -41,8 +41,11 @@ function build() {
 function import_dependencies() {
   pids=()
   for repository in $(printf '%s' "${repositories}"); do
-    printf '%s\n' "Getting ${repository}..."
-    go get -u "${repository}/..." # & pids+=(${!})
+    if [[ ! -d "src/${repository}" ]]; then
+      start_spinner "Getting ${repository}..."
+      go get -u "${repository}/..." # & pids+=(${!})
+      stop_spinner "${?}"
+    fi
   done
   for pid in "${pids[@]}"; do
     wait "${pid}"
@@ -61,15 +64,10 @@ EOF
 
 pushd "${GOPATH}" 1> /dev/null
 {
+  # Make sure all dependencies are imported.
+  import_dependencies
+
   # Build.
-  build || result=${?}
-
-  if (( result != 0 )); then
-    # Import all repositories asynchronously.
-    import_dependencies
-
-    # Build again.
-    build || true
-  fi
+  build
 }
 popd 1> /dev/null
