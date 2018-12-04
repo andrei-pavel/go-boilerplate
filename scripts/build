@@ -18,7 +18,7 @@ while (( ${#} > 0 )); do
   *)
     # [\$architecture]              architecture to build for i.e. 'arm',
     #                              'windows', otherwise build natively
-    [[ -z ${architecture+x} ]] && architecture="${1}" && shift && continue
+    [[ -z "${architecture+x}" ]] && architecture="${1}" && shift && continue
     # Unrecognized argument
     printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; printUsage; exit 1 ;;
   esac; shift
