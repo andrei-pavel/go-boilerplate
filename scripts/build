@@ -25,7 +25,7 @@ while (( ${#} > 0 )); do
 done
 
 function build() {
-  if [[ -z ${architecture+x} ]]; then
+  if [[ -z "${architecture+x}" ]]; then
     start_spinner 'Building...'
     go build -v
   elif [[ ${architecture} == "arm" ]]; then
