@@ -35,8 +35,7 @@ function build() {
     start_spinner 'Building for Windows...'
     env GOOS=windows GOARCH=amd64 go build -v
   fi
-  result=${?}
-  stop_spinner ${result}
+  stop_spinner ${?}
 }
 
 function import_dependencies() {
