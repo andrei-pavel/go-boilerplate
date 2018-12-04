@@ -34,13 +34,15 @@ pushd "${toplevel}" 1> /dev/null
     root_directory="$(basename "${toplevel}")"
     for host in "${@}"; do
       start_spinner "Uploading to ${host}..."
-      scripts/rsync-synchronize "./" "${host}:${root_directory}/"
+      ssh "${host}" "rm -rf ${root_directory}"
+      ./scripts/rsync-synchronize "./" "${host}:${root_directory}/"
       stop_spinner ${?}
 
       start_spinner "Deploying remotely on ${host}..."
       ssh "${host}" "\
         cd \"${root_directory}\"
-        scripts/deploy $(additional)
+        ./scripts/docker-clean -a
+        ./scripts/deploy $(additional)
       "
       stop_spinner ${?}
     done
