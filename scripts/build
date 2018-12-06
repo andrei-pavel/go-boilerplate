@@ -20,31 +20,31 @@ while (( ${#} > 0 )); do
     #                              'windows', otherwise build natively
     [[ -z "${architecture+x}" ]] && architecture="${1}" && shift && continue
     # Unrecognized argument
-    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; printUsage; exit 1 ;;
+    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
   esac; shift
 done
 
 function build() {
   if [[ -z "${architecture+x}" ]]; then
-    start_spinner 'Building...'
+    start-spinner 'Building...'
     go build -v
   elif [[ ${architecture} == "arm" ]]; then
-    start_spinner 'Building for Linux ARM...'
+    start-spinner 'Building for Linux ARM...'
     env GOOS=linux GOARCH=arm GOARM=6 go build -v
   elif [[ ${architecture} == "windows" ]]; then
-    start_spinner 'Building for Windows...'
+    start-spinner 'Building for Windows...'
     env GOOS=windows GOARCH=amd64 go build -v
   fi
-  stop_spinner ${?}
+  stop-spinner ${?}
 }
 
 function import_dependencies() {
   pids=()
   for repository in $(printf '%s' "${repositories}"); do
     if [[ ! -d "src/${repository}" ]]; then
-      start_spinner "Getting ${repository}..."
+      start-spinner "Getting ${repository}..."
       go get -u "${repository}/..." # & pids+=(${!})
-      stop_spinner "${?}"
+      stop-spinner "${?}"
     fi
   done
   for pid in "${pids[@]}"; do
