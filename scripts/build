@@ -38,12 +38,12 @@ function build() {
   stop-spinner ${?}
 }
 
-function import_dependencies() {
+function import-dependencies() {
   pids=()
   for repository in $(printf '%s' "${repositories}"); do
     if [[ ! -d "src/${repository}" ]]; then
       start-spinner "Getting ${repository}..."
-      go get -u "${repository}/..." # & pids+=(${!})
+      go get -u "${repository}" # & pids+=(${!})
       stop-spinner "${?}"
     fi
   done
@@ -65,7 +65,7 @@ EOF
 pushd "${GOPATH}" 1> /dev/null
 {
   # Make sure all dependencies are imported.
-  import_dependencies
+  import-dependencies
 
   # Build.
   build
