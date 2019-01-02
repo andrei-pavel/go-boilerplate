@@ -2,14 +2,17 @@
 
 Contains self-sufficient build system, document-generator, formatter & linter.
 
+
 ## Usage
+
 ```
-scripts/build [--fast]
-scripts/doc
-scripts/fmt
-scripts/install
-scripts/lint
-scripts/run
+./scripts/build
+./scripts/doc
+./scripts/fmt
+./scripts/install
+./scripts/lint
+./scripts/run
+./go-boilerplate -c|--config ./config.yaml
 ```
 
 
