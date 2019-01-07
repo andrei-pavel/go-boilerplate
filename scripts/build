@@ -79,7 +79,9 @@ pushd "$(git rev-parse --show-toplevel)" 1> /dev/null
     import-dependencies
   else
     # Make sure all dependencies are up to date.
+    start-spinner 'Getting latest dependencies...'
     go get -u
+    stop-spinner ${?}
   fi
 
   # Build.
