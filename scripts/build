@@ -71,7 +71,6 @@ HERE_DOCUMENT
   )"
 fi
 
-
 pushd "$(git rev-parse --show-toplevel)" 1> /dev/null
 {
   if ${old}; then
