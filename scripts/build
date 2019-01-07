@@ -63,19 +63,26 @@ function import-dependencies() {
 # Export Go variables.
 if ${old}; then
   . "${SCRIPT_PATH}/go-env"
-fi
-
-# Define repositories to import.
-repositories="$(cat <<EOF
+  # Define repositories to import.
+  repositories="$(cat \
+<<HERE_DOCUMENT
 github.com/go-yaml/yaml
-EOF
-)"
-
-if ${old}; then
-  pushd "${GOPATH}" 1> /dev/null
-  # Make sure all dependencies are imported.
-  import-dependencies
+HERE_DOCUMENT
+  )"
 fi
 
-# Build.
-build
+
+pushd "$(git rev-parse --show-toplevel)" 1> /dev/null
+{
+  if ${old}; then
+    # Make sure all dependencies are imported.
+    import-dependencies
+  else
+    # Make sure all dependencies are up to date.
+    go get -u
+  fi
+
+  # Build.
+  build
+}
+popd 1> /dev/null

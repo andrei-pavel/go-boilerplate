@@ -7,55 +7,64 @@
 ARGUMENTS="\
   [-wd|--with-docker]          run tests on Docker
   \$hosts                       hosts to deploy to
+  [-o|--old]                   test the old way with exporting GOPATH
 "
 SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 . "${SCRIPT_PATH}/lib/header"
 . "${SCRIPT_PATH}/lib/utils"
 
 # Parse arguments.
-with_docker=false
 while (( ${#} > 0 )); do
   case "${1}" in
+  # [-o|--old]                   build the old way with exporting GOPATH
+  '-o'|'--old') old=true ;;
   # [-wd|--with-docker]          run tests on Docker
   '-wd'|'--with-docker') with_docker=true ;;
   *) hosts+=" ${1}"
   esac; shift
 done
 
+# Default arguments
+[[ -z "${old+x}" ]] && old=false
+[[ -z "${with_docker+x}" ]] && with_docker=false
+
 # Export Go variables.
-. "${SCRIPT_PATH}/go-env"
+if ${old}; then
+  . "${SCRIPT_PATH}/go-env"
+fi
 
-pushd "${GOPATH}" 1> /dev/null
-{
-  if ${with_docker}; then
-    if (( ${#hosts} == 0 )); then
-      # Locally
+toplevel="$(git rev-parse --show-toplevel)"
+pushd "${toplevel}" 1> /dev/null
+if ${with_docker}; then
+  if (( ${#hosts} == 0 )); then
+    # Locally
 
-      # Make sure network exists.
-      network="$(docker network ls -q --filter 'name=Network-Boilerplate')"
-      if [[ -z "${network}" ]]; then
-        docker network create 'Network-Boilerplate'
-      fi
-
-      # Build and run.
-      pushd './scripts/docker/test' 1> /dev/null
-      {
-        docker-compose up --build --abort-on-container-exit --force-recreate
-      }
-      popd 1> /dev/null
-    else
-      # Remotely
-      root_directory="$(basename "${GOPATH}")"
-      for host in ${hosts}; do
-        scripts/rsync-synchronize "./" "${host}:${root_directory}/"
-        ssh "${host}" "\
-          cd \"${root_directory}\"
-          scripts/test $(additional)
-        "
-      done
+    # Make sure network exists.
+    network="$(docker network ls -q --filter 'name=Network-Boilerplate')"
+    if [[ -z "${network}" ]]; then
+      docker network create 'Network-Boilerplate'
     fi
+
+    # Build and run.
+    pushd './scripts/docker/test' 1> /dev/null
+    {
+      docker-compose up --build --abort-on-container-exit --force-recreate
+    }
+    popd 1> /dev/null
   else
-    directories=$(find src -type d | sort -V)  # sort for same order on subsequent runs
+    # Remotely
+    root_directory="$(basename "${toplevel}")"
+    for host in ${hosts}; do
+      scripts/rsync-synchronize "./" "${host}:${toplevel}/"
+      ssh "${host}" "\
+        cd \"${toplevel}\"
+        scripts/test $(additional)
+      "
+    done
+  fi
+else
+  if ${old}; then
+    directories=$(find "${toplevel}" -type d -not -path '.git/*' | sort -V)  # sort for same order on subsequent runs
     for directory in ${directories}; do
       if [[ ${directory} == *"github.com"* ]]; then
         continue
@@ -68,10 +77,11 @@ pushd "${GOPATH}" 1> /dev/null
       fi
       pushd ${directory} 1> /dev/null
       {
-        go test -args --config "${GOPATH}/config.yaml" || true
+        go test -args --config "${toplevel}/config.yaml" || true
       }
       popd 1> /dev/null
     done
+  else
+    go test -args --config "${toplevel}/config.yaml" || true
   fi
-}
-popd 1> /dev/null
+fi

@@ -5,6 +5,7 @@
 
 # Header
 ARGUMENTS="\
+  [-o|--old]                   install the old way with exporting GOPATH
 "
 SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 . "${SCRIPT_PATH}/lib/header"
@@ -13,16 +14,23 @@ SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 # Parse arguments.
 while (( ${#} > 0 )); do
   case "${1}" in
+  # [-o|--old]                   build the old way with exporting GOPATH
+  '-o'|'--old') old=true ;;
   *)
     # Unrecognized argument
     printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
   esac; shift
 done
 
-# Export Go variables.
-. "${SCRIPT_PATH}/go-env"
+# Default arguments
+[[ -z "${old+x}" ]] && old=false
 
-pushd "${GOPATH}" 1> /dev/null
+# Export Go variables.
+if ${old}; then
+  . "${SCRIPT_PATH}/go-env"
+fi
+
+pushd "$(git rev-parse --show-toplevel)" 1> /dev/null
 {
   start-spinner 'Installing...'
   go install -v
