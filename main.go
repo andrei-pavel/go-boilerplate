@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"config"
+	"github.com/andrei-pavel/go-boilerplate/config"
 )
 
 func main() {
