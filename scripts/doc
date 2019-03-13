@@ -39,4 +39,3 @@ pushd "${toplevel}" 1> /dev/null
   stop-spinner ${?}
 }
 popd 1> /dev/null
-
