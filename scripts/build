@@ -82,6 +82,7 @@ pushd "$(git rev-parse --show-toplevel)" 1> /dev/null
     go get -u
     stop-spinner ${?}
   fi
+  go mod tidy
 
   # Build.
   build
