@@ -21,7 +21,7 @@ done
 
 if ! command -v godoc 1> /dev/null; then
   start-spinner 'Retrieving godoc...'
-  go get -u golang.org/x/tools/cmd/godoc
+  go install golang.org/x/tools/cmd/godoc
   stop-spinner ${?}
 fi
 

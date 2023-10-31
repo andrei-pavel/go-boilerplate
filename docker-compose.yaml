@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: go-boilerplate
     image: go-boilerplate:self-built
-    restart: always
+    restart: unless-stopped
     ports:
       - 1025:1025
 

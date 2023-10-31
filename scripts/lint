@@ -29,7 +29,7 @@ done
 # Install gometalinter if not installed.
 export PATH="${PATH}:${GOPATH}/bin"
 if ! command -v gometalinter 1> /dev/null; then
-  go get -u github.com/alecthomas/gometalinter
+  go install github.com/alecthomas/gometalinter
   gometalinter --install
 fi
 

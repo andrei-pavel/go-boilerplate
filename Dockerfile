@@ -1,8 +1,8 @@
 #################################### BUILDER ###################################
-FROM golang:latest AS builder
+FROM alpine AS builder
 
 # Install dependencies.
-RUN apk add --update-cache bash git
+RUN apk add --update-cache bash git go
 
 # Copy git repository to guest.
 ADD . /opt/go-boilerplate
@@ -20,4 +20,4 @@ COPY --from=builder /opt/go-boilerplate/go-boilerplate /opt/go-boilerplate/confi
 
 # Run.
 WORKDIR /opt
-CMD ["/bin/sh", "-c", "./go-boilerplate --config ./config.yaml"]
+CMD ['/bin/sh', '-c', './go-boilerplate --config ./config.yaml']
